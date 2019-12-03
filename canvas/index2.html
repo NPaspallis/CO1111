@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Arkanoid</title>
+</head>
+<body>
+
+    <canvas id="myCanvas" width="640" height="480" style="border:1px solid #000000;"></canvas>
+
+    <script>
+        let canvas = document.getElementById("myCanvas");
+        canvas.addEventListener("mousedown", handleClick, false);
+
+        const WIDTH = canvas.width;
+        const HEIGHT = canvas.height;
+        const BALL_RADIUS = 20;
+
+
+        let ctx = canvas.getContext("2d");
+
+        const DELAY = 50;
+
+        /* Returns a random integer in the range start, ..., finish-1 */
+        function random(start, finish) {
+            return start + Math.floor(Math.random() * (finish - start + 1));
+        }
+
+        const colors = [ "#000000", "#0000f0", "#00f000", "#f0f000", "#f000f0", "#f00000", "#00f0f0" ];
+
+        function randomColor() {
+            return colors[random(0, colors.length)];
+        }
+
+        class Ball {
+            x = random(0, WIDTH);
+            y = random(0, HEIGHT);
+            speed_x = random(-10, 10);
+            speed_y = random(-10, 10);
+            color = randomColor();
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.moveTo(this.x, this.y);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, BALL_RADIUS, 0, 2 * Math.PI, true);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            move() {
+                this.x += this.speed_x;
+                this.y += this.speed_y;
+            }
+
+            bounceCheck() {
+                if(this.x < 0 && this.speed_x < 0) this.speed_x = -this.speed_x;
+                if(this.x > WIDTH && this.speed_x > 0) this.speed_x = -this.speed_x;
+                if(this.y < 0 && this.speed_y < 0) this.speed_y = -this.speed_y;
+                if(this.y > HEIGHT && this.speed_y > 0) this.speed_y = -this.speed_y;
+            }
+
+            handleClick(p_x, p_y) {
+                this.speed_x = (p_x - this.x) / 50;
+                this.speed_y = (p_y - this.y) / 50;
+            }
+        }
+
+
+        function handleClick(event) {
+            console.debug("Clicked: " + event.x + "," + event.y);
+            if(event.which === 3) {
+                for(let i = 0; i < NUM_OF_BALLS; i++) balls.push(new Ball());
+            } else {
+                for(ball of balls) {
+                    ball.handleClick(event.x, event.y)
+                }
+            }
+        }
+
+        setTimeout(loop, DELAY); // start task to call function every 'DELAY' milliseconds
+
+        const NUM_OF_BALLS = 20;
+        let balls = [];
+        for(let i = 0; i < NUM_OF_BALLS; i++) balls.push(new Ball());
+
+        // let ball = new Ball();
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(ball of  balls) {
+                ball.move();
+                ball.bounceCheck();
+                ball.draw();
+            }
+
+            setTimeout(loop, DELAY); // reschedule task to call function every 'DELAY' milliseconds
+        }
+
+    </script>
+</body>
+</html>

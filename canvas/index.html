@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Arkanoid</title>
+</head>
+<body>
+
+    <canvas id="myCanvas" width="640" height="480" style="border:1px solid #000000;"></canvas>
+
+    <script>
+        let canvas = document.getElementById("myCanvas");
+        canvas.addEventListener("mousedown", handleClick, false);
+
+        const WIDTH = canvas.width;
+        const HEIGHT = canvas.height;
+
+        let ctx = canvas.getContext("2d");
+
+        const BALL_RADIUS = 20;
+
+        function drawBall() {
+            ctx.fillStyle = color;
+            // ctx.color = color;
+            ctx.moveTo(x, y);
+            ctx.beginPath();
+            ctx.arc(x, y, BALL_RADIUS, 0, 2 * Math.PI, true);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        const DELAY = 50;
+
+        /* Returns a random integer in the range start, ..., finish-1 */
+        function random(start, finish) {
+            return start + Math.floor(Math.random() * (finish - start + 1));
+        }
+
+        const colors = [ "#000000", "#0000f0", "#00f000", "#f0f000", "#f000f0", "#f00000", "#00f0f0" ];
+
+        function randomColor() {
+            return colors[random(0, colors.length)];
+        }
+
+        let x = random(0, WIDTH);
+        let y = random(0, HEIGHT);
+        let speed_x = random(-10, 10);
+        let speed_y = random(-10, 10);
+        let color = randomColor();
+
+        function handleClick(event) {
+            speed_x = (event.x - ball_x) / 50;
+            speed_y = (event.y - ball_y) / 50;
+        }
+
+        function move() {
+            x += speed_x;
+            y += speed_y;
+        }
+
+        function bounceCheck() {
+            if(x < 0 && speed_x < 0) speed_x = -speed_x;
+            if(x > WIDTH && speed_x > 0) speed_x = -speed_x;
+            if(y < 0 && speed_y < 0) speed_y = -speed_y;
+            if(y > HEIGHT && speed_y > 0) speed_y = -speed_y;
+        }
+
+        function updateUI() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+        }
+
+        setTimeout(loop, DELAY); // start task to call function every 'DELAY' milliseconds
+
+        function loop() {
+            move();
+            bounceCheck();
+            updateUI();
+            setTimeout(loop, DELAY); // reschedule task to call function every 'DELAY' milliseconds
+        }
+
+    </script>
+</body>
+</html>
